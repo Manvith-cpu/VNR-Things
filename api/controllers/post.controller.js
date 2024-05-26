@@ -27,18 +27,25 @@ export const getposts = async (req, res,next)=>{
         const startIndex=parseInt(req.query.startIndex)||0;
         const limit=parseInt(req.query.limit)||9;
         const sortDirection=req.query.order==='asc'?1:-1;
-        const posts=await Post.find({
-            ...(req.query.userId && {userId:req.query.userId}),
-            ...(req.query.category && {category:req.query.category}),
-            ...(req.query.slug && {slug:req.query.slug}),
-            ...(req.query.postId && {_id:req.query.postId}),
-            ...(req.query.postId && {
-                $or:[
-                    {title:{$regex: req.query.searchTerm,$options:'i'}},
-                    {content:{$regex: req.query.searchTerm,$options:'i'}}
-                ],
-            }),
-    }).sort({updatedAt:sortDirection}).skip(startIndex).limit(limit);
+        const query = {
+            ...(req.query.userId && { userId: req.query.userId }),
+            ...(req.query.category && { category: req.query.category }),
+            ...(req.query.slug && { slug: req.query.slug }),
+            ...(req.query.postId && { _id: req.query.postId }),
+        };
+
+        // If searchTerm is provided, add the $or condition for text search
+        if (req.query.searchTerm) {
+            query.$or = [
+                { title: { $regex: req.query.searchTerm, $options: 'i' } },
+                { content: { $regex: req.query.searchTerm, $options: 'i' } }
+            ];
+        }
+
+        const posts = await Post.find(query)
+            .sort({ updatedAt: sortDirection })
+            .skip(startIndex)
+            .limit(limit);
 
     const totalPosts=await Post.countDocuments();
 
@@ -74,5 +81,26 @@ export const deletepost=async (req,res,next)=>{
     }
 }
 
-
+export const updatepost = async (req, res, next) => {
+    if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+      return next(errorHandler(403, 'You are not allowed to update this post'));
+    }
+    try {
+      const updatedPost = await Post.findByIdAndUpdate(
+        req.params.postId,
+        {
+          $set: {
+            title: req.body.title,
+            content: req.body.content,
+            category: req.body.category,
+            image: req.body.image,
+          },
+        },
+        { new: true }
+      );
+      res.status(200).json(updatedPost);
+    } catch (error) {
+      next(error);
+    }
+  };
 
