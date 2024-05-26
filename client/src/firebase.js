@@ -15,3 +15,23 @@ const firebaseConfig = {
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
+
+function checkIfWindowClosed(someWindow) {
+  try {
+      if (someWindow.closed) {
+          console.log("Window is closed.");
+      } else {
+          console.log("Window is open.");
+      }
+  } catch (e) {
+      console.error("Cross-Origin-Opener-Policy blocked the window.closed call:", e);
+      // Implement fallback mechanism or alternative logic here
+  }
+}
+
+// Example usage
+let someWindow = window.open('https://example.com');
+// Check the window status after a delay
+setTimeout(() => {
+  checkIfWindowClosed(someWindow);
+}, 5000);
