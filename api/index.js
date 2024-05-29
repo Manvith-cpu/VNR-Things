@@ -29,9 +29,14 @@ app.use((req, res, next) => {
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-    res.setHeader("Access-Control-Allow-Origin", "*");
     next();
   });
+
+  app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
   app.use((req, res, next) => {
     res.setHeader("Content-Security-Policy", "img-src 'self' data: *");
