@@ -7,6 +7,7 @@ import postRoutes from './routes/post.route.js';
 import commentRoutes from './routes/comment.routes.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import helmet from 'helmet';
 
 dotenv.config();
 
@@ -23,6 +24,12 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(helmet());
+app.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+    next();
+  });
 
 
 app.listen(3000,()=>{
