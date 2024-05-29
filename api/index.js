@@ -32,7 +32,7 @@ app.use((req, res, next) => {
   });
 
   app.use((req, res, next) => {
-    res.setHeader("Content-Security-Policy", "img-src 'self' data: https://bairesdev.mo.cloudinary.net/blog/2023/08/What-Is-JavaScript-Used-For.jpg");
+    res.setHeader("Content-Security-Policy", "img-src 'self' data: *");
     next();
   });
 
